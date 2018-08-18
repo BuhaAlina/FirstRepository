@@ -5,6 +5,8 @@ import com.test.Test.helper.ResponseObject;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 
@@ -24,9 +26,11 @@ public class User implements ResponseObject {
     String firstName;
 
     @Column(name = "last_name")
+
     String lastName;
 
     @Column(name = "password")
+    //@Size(min=5)
     String password;
 
     @Column(name = "active") //set default value to 1
