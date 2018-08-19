@@ -1,6 +1,7 @@
 package com.test.Test.controller;
 
 import com.test.Test.helper.InternshipResponse;
+import com.test.Test.helper.ResponseObject;
 import com.test.Test.helper.VerifyEmail;
 import com.test.Test.model.User;
 import com.test.Test.service.UserService;
@@ -9,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -56,11 +56,38 @@ public class UserController {
 
         }
             return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "The provided email and password  doesn't belong to any existing account", null));
-
     }
 
     //logout user --/logout*********
-    //get all users --/users*********
-    //create Admin --/create/admin*********
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public ResponseEntity logout(@RequestHeader("reset_token") final String token) {
 
+        User dbUser = userService.findUserByResetToken(token);
+        if( dbUser != null){
+            dbUser.setResetToken(null);
+            userService.saveUser(dbUser);
+            return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, "Successfull Logout!", Arrays.asList(dbUser)));
+        }else
+        {
+                return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "No session token available!", null));}
+
+    }
+
+    //get all users --/users*********
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ResponseEntity users (@RequestHeader ("reset_token") final String token) {
+        User dbUser = userService.findUserByResetToken(token);
+        if (dbUser != null) {
+           List<ResponseObject> listUsers= new ArrayList<ResponseObject>();
+           listUsers.addAll(userService.findAllUser());
+            return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, "List of users: ", listUsers));
+        }
+            return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "Access Denied", null));}
+
+    //create Admin --/create/admin*********
+    //PUT-- /create/admin--create admin account to admin
+    //user delete
+    //POST /reset -password
+    //PUT /user--update user
+    //GET /user -get one user by email
 }
