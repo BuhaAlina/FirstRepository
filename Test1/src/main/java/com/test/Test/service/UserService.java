@@ -11,4 +11,7 @@ public interface UserService {
     User findUserByEmail(String email);
     User  findUserByResetToken(String token);
    List<User> findAllUser();
+    boolean tokenIsValid(String token);
+     boolean isAdmin(User user);
+
 }

@@ -30,11 +30,10 @@ public class User implements ResponseObject {
     String lastName;
 
     @Column(name = "password")
-    //@Size(min=5)
     String password;
 
     @Column(name = "active") //set default value to 1
-            int active = 1;
+     int active = 1;
 
     @Column(name = "reset_token")
     String resetToken;

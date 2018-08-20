@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,6 +23,7 @@ public class UserServiceImpl implements UserService {
     public String hashPassword(String password){
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
+
     @Override
     public void saveUser(User user) {
         //user.setPassword(hashPassword(user.getPassword()));
@@ -47,11 +45,26 @@ public class UserServiceImpl implements UserService {
     public List<User> findAllUser( ){
         List<User> users =  userRepository.findAll();
 
-
-       /* List<ResponseObject> listUsers= new ArrayList<ResponseObject>( );
-        listUsers.add(users);*/
-        //userRepository.findAll();
-
       return users;
     }
+
+    public boolean tokenIsValid(String token) {
+        User dbUser = findUserByResetToken(token);
+        if (dbUser != null)
+            return true;
+        return false;
+    }
+
+    public  boolean isAdmin(User user){
+
+        boolean control = false;
+
+        for(Role role: user.getRoles())
+        {
+            control = Objects.equals(role.getName(), "ADMIN");
+        }
+
+        return  control;
+    }
+
 }
