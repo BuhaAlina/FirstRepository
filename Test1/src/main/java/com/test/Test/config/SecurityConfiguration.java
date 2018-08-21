@@ -30,6 +30,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, "/reset").permitAll()
                 .antMatchers(GET, "/categories").permitAll()
                 .antMatchers(POST, "/create/category").permitAll()
+                .antMatchers(POST, "/update/category").permitAll()
                 .antMatchers(POST, "/create/course").permitAll()
                 .antMatchers(GET, "/courses").permitAll()
                 .antMatchers(GET, "/course").permitAll()
@@ -47,7 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, "/create/answer").permitAll()
                 .antMatchers(DELETE, "/user").permitAll()
                 .antMatchers(POST, "/answer/point").permitAll()
-                .antMatchers(PUT, "/create/admin").permitAll()
+                .antMatchers(POST, "/create/admin").permitAll()
                 .antMatchers(DELETE, "/delete/category").permitAll()
                 //.antMatchers(GET, "/login").permitAll()   //.hasAuthority("ROLE_ADMIN")
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()//allow CORS option calls

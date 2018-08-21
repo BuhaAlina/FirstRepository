@@ -4,9 +4,7 @@ import com.test.Test.helper.InternshipResponse;
 import com.test.Test.helper.ResponseObject;
 
 import com.test.Test.helper.VerifyEmail;
-import com.test.Test.model.Role;
 import com.test.Test.model.User;
-import com.test.Test.repository.RoleRepository;
 import com.test.Test.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +20,6 @@ import java.util.*;
 public class UserController {
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-
-
 
 
     //user registration --/create/user *************
@@ -56,7 +48,7 @@ public class UserController {
                 dbUser.setResetToken(resetToken);
                 userService.saveUser(dbUser);
                 return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, dbUser.getResetToken(), Arrays.asList(dbUser)));
-            }else{return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "Login user", null));}
+            }else{return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, " User is login ", null));}
 
         }else { return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "User is not active!", null));}
 
@@ -81,8 +73,6 @@ public class UserController {
     //get all users --/users*********
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ResponseEntity users (@RequestHeader ("reset_token") final String token) {
-        //User dbUser = userService.findUserByResetToken(token);
-        //if(dbUser!= null)
         if (userService.tokenIsValid(token)){
            List<ResponseObject> listUsers= new ArrayList<ResponseObject>();
            listUsers.addAll(userService.findAllUser());
@@ -97,33 +87,32 @@ public class UserController {
          User user =userService.findUserByEmail(email);
             if (user != null) {
                 return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, "Success", Arrays.asList(user)));
-            } else {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new InternshipResponse(false, "Please provide a valid id.", null));}
+            } else {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new InternshipResponse(false, "Please provide a valid email.", null));}
         }
         return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "You are not authorized to perform this operation!", null));
     }
 
     //PUT --/create/admin --create Admin account by admin *********
-    @RequestMapping(value="/create/admin",method = RequestMethod.PUT)
+    @RequestMapping(value="/create/admin",method = RequestMethod.POST)
     public ResponseEntity createAdmin(@RequestHeader("reset_token") final String token,@RequestBody User admin) {
+            if (userService.isAdmin(token) && userService.tokenIsValid(token)) {
+                String email = admin.getEmail();
+                if (VerifyEmail.emailIsValid(email)) {
+                    if (userService.findUserByEmail(email) == null) {
+                        admin.setPassword(userService.hashPassword(admin.getPassword()));
+                        userService.saveAdmin(admin);
+                        return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, "Admin [" + admin.getEmail() + "] created successfully!", Arrays.asList(admin)));
 
-        User userAdmin = userService.findUserByResetToken(token);
-        if (userService. isAdmin(userAdmin)) {
-            String email = admin.getEmail();
-            if (VerifyEmail.emailIsValid(email)) {
-                if (userService.findUserByEmail(email) == null) {
-                    admin.setPassword(userService.hashPassword(admin.getPassword()));
-                    Role userRole = roleRepository.findByName("ADMIN");
-                    admin.setRoles(new HashSet<>(Collections.singletonList(userRole)));
-                    userService.saveUser(admin);
-                    return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, "Admin [" + admin.getEmail() + "] created successfully!", Arrays.asList(admin)));
-
-                } else {
-                    return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "The selected email already belongs to an account. Please use a different one!", null)); }
+                    } else {
+                        return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "The selected email already belongs to an account. Please use a different one!", null));
+                    }
 
                 } else {
-                    return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "The supplied email address is not valid!", null)); }
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "You are not authorized to perform this operation!", null));
+                    return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "The supplied email address is not valid!", null));
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "You are not authorized to perform this operation!", null));}
+
     }
 
     //POST /reset -password
@@ -154,11 +143,12 @@ public class UserController {
 
 
     }
+
     //DELETE --/delete --user soft-delete
     @RequestMapping(value = "/user", method = RequestMethod.DELETE)
     public ResponseEntity userDelete (@RequestHeader("reset_token") final String token,@RequestBody User user) {
-    User userAdmin = userService.findUserByResetToken(token);
-        if (userService. isAdmin(userAdmin)) {
+    //User userAdmin = userService.findUserByResetToken(token);
+        if (userService. isAdmin(token)) {
             User dbUser = userService.findUserByEmail(user.getEmail());
             if(dbUser!=null){
                 dbUser.setActive(0);

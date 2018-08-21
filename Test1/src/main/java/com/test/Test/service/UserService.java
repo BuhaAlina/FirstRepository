@@ -7,11 +7,12 @@ import java.util.List;
 public interface UserService {
 
      void saveUser(User user);
+    void saveAdmin(User user);
     String hashPassword(String password);
     User findUserByEmail(String email);
     User  findUserByResetToken(String token);
    List<User> findAllUser();
     boolean tokenIsValid(String token);
-     boolean isAdmin(User user);
+     boolean isAdmin(String token);
 
 }
