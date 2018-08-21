@@ -26,8 +26,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(User user) {
-        //user.setPassword(hashPassword(user.getPassword()));
+
         Role userRole = roleRepository.findByName("USER");
+        user.setRoles(new HashSet<>(Collections.singletonList(userRole)));
+        userRepository.save(user);
+
+    }
+    @Override
+    public void saveAdmin(User user) {
+        //user.setPassword(hashPassword(user.getPassword()));
+        Role userRole = roleRepository.findByName("ADMIN");
         user.setRoles(new HashSet<>(Collections.singletonList(userRole)));
         userRepository.save(user);
 
@@ -49,22 +57,28 @@ public class UserServiceImpl implements UserService {
     }
 
     public boolean tokenIsValid(String token) {
+        if(token==null){
+            return false;
+        }else{
         User dbUser = findUserByResetToken(token);
-        if (dbUser != null)
-            return true;
-        return false;
+        if (dbUser == null)
+            return false;}
+        return true;
     }
 
-    public  boolean isAdmin(User user){
+    public  boolean isAdmin(String token){
 
+   User user= findUserByResetToken(token);
         boolean control = false;
 
-        for(Role role: user.getRoles())
-        {
-            control = Objects.equals(role.getName(), "ADMIN");
-        }
+   if (user==null){return false;}
+       else {
 
-        return  control;
+       for (Role role : user.getRoles()) {
+           control = Objects.equals(role.getName(), "ADMIN");
+       }
+   } return  control;
+
     }
 
 }
