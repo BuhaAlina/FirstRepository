@@ -25,7 +25,7 @@ public class CategoryCotroller {
 
     //  POST  /create/category - create a new course category - data sent in the request body
     @RequestMapping(value = "/create/category",method = RequestMethod.POST)
-    public ResponseEntity createCategory (@RequestBody Category category,@RequestHeader ("reset_token") final String token) {
+    public ResponseEntity createCategory (@RequestBody Category category,@RequestHeader ("token") final String token) {
         if (userService.isAdmin(token) && userService.tokenIsValid(token)) {
 
             if (categoryService.findCategoryByName(category.getName()) == null) {
@@ -40,9 +40,9 @@ public class CategoryCotroller {
         return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "You are not authorized to perform this operation!", null));
     }
 
-    //POST --/category--update category
-        @RequestMapping(value = "/update/category",method = RequestMethod.POST)
-        public ResponseEntity updateCategory (@RequestParam("name") final String name,@RequestBody Category category,@RequestHeader ("reset_token") final String token)
+    //PUT --/category--update category
+        @RequestMapping(value = "/category",method = RequestMethod.PUT)
+        public ResponseEntity updateCategory (@RequestParam("name") final String name,@RequestBody Category category,@RequestHeader ("token") final String token)
         {if(userService.isAdmin(token)&&userService.tokenIsValid(token)){
             Category dbCategory=categoryService.findCategoryByName(name);
             if(dbCategory !=null){
@@ -56,13 +56,13 @@ public class CategoryCotroller {
 
         }
 
-    //GET   /categories - get all the course categories:OK
+    //GET   /categories - get all  categories
     @RequestMapping(value = "/categories",method = RequestMethod.GET)
-    public ResponseEntity updateCategory (@RequestHeader ("reset_token") final String token)
+    public ResponseEntity getcategories (@RequestHeader ("token") final String token)
     {
         if(userService.tokenIsValid(token)){
             List<ResponseObject> listCategories =new ArrayList<>();
-            listCategories.addAll(categoryService.findAllUser());
+            listCategories.addAll(categoryService.findAllCategory());
             return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(true, "Category list !", listCategories));
         }return ResponseEntity.status(HttpStatus.OK).body(new InternshipResponse(false, "You are not authorized to perform this operation!", null));
     }

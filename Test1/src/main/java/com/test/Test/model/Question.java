@@ -16,16 +16,16 @@ public class Question implements ResponseObject
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private int id;
+     int id;
 
     @Column(name = "name")
-    private String name;
+    String name;
 
     @Column(name = "content")
-    private String content;
+    String content;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "chapter_id", referencedColumnName="id")
-    private Chapter chapter;
+     Chapter chapter;
 
  }
