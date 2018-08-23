@@ -10,8 +10,8 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private CategoryService categoryService;
+   /* @Autowired
+    private CategoryService categoryService;*/
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -20,14 +20,21 @@ public class CategoryServiceImpl implements CategoryService {
     public void saveCategory (Category category){
         categoryRepository.save(category);
     }
+
     @Override
     public Category findCategoryByName(String name){
         return categoryRepository.findByName(name);
     }
 
     @Override
-    public List<Category> findAllUser( ){
-        List<Category> categories =  categoryRepository.findAll();
+    public Category findCourseByCategoryId(int id){
+
+        return categoryRepository.findById(id);
+    }
+
+    @Override
+    public List<Category> findAllCategory( ){
+        List<Category> categories = categoryRepository.findAll();
 
         return categories;
     }

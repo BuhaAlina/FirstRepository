@@ -58,7 +58,7 @@ public class UserController {
 
     //logout user --/logout*********
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity logout(@RequestHeader("reset_token") final String token) {
+    public ResponseEntity logout(@RequestHeader("token") final String token) {
         User dbUser = userService.findUserByResetToken(token);
         if( dbUser != null){
             dbUser.setResetToken(null);
@@ -72,7 +72,7 @@ public class UserController {
 
     //get all users --/users*********
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity users (@RequestHeader ("reset_token") final String token) {
+    public ResponseEntity users (@RequestHeader ("token") final String token) {
         if (userService.tokenIsValid(token)){
            List<ResponseObject> listUsers= new ArrayList<ResponseObject>();
            listUsers.addAll(userService.findAllUser());
@@ -82,7 +82,7 @@ public class UserController {
 
     //GET /user -get one user by email
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public ResponseEntity user (@RequestParam("email") final String email, @RequestHeader ("reset_token") final String token) {
+    public ResponseEntity user (@RequestParam("email") final String email, @RequestHeader ("token") final String token) {
         if (userService.tokenIsValid(token)) {
          User user =userService.findUserByEmail(email);
             if (user != null) {
@@ -94,7 +94,7 @@ public class UserController {
 
     //PUT --/create/admin --create Admin account by admin *********
     @RequestMapping(value="/create/admin",method = RequestMethod.POST)
-    public ResponseEntity createAdmin(@RequestHeader("reset_token") final String token,@RequestBody User admin) {
+    public ResponseEntity createAdmin(@RequestHeader("token") final String token,@RequestBody User admin) {
             if (userService.isAdmin(token) && userService.tokenIsValid(token)) {
                 String email = admin.getEmail();
                 if (VerifyEmail.emailIsValid(email)) {
@@ -129,7 +129,7 @@ public class UserController {
     }
     //PUT /user--update user
     @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public ResponseEntity userUpdate (@RequestHeader("reset_token") final String token,@RequestBody User user) {
+    public ResponseEntity userUpdate (@RequestHeader("token") final String token,@RequestBody User user) {
         User dbUser = userService.findUserByResetToken(token);
         if( dbUser != null){
             dbUser.setLastName(user.getLastName());
@@ -146,7 +146,7 @@ public class UserController {
 
     //DELETE --/delete --user soft-delete
     @RequestMapping(value = "/user", method = RequestMethod.DELETE)
-    public ResponseEntity userDelete (@RequestHeader("reset_token") final String token,@RequestBody User user) {
+    public ResponseEntity userDelete (@RequestHeader("token") final String token,@RequestBody User user) {
     //User userAdmin = userService.findUserByResetToken(token);
         if (userService. isAdmin(token)) {
             User dbUser = userService.findUserByEmail(user.getEmail());
